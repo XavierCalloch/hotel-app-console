@@ -1,35 +1,26 @@
-var request = require('request');
-var baseUrlClients = 'http://localhost:8080/clients';
+const requestPromise = require('request-promise-native')
 
-function listerClients(callbackSuccess, callbackErr) {
-    // Envoi de la requête http GET /clients?start=0&size=10
-    request(baseUrlClients + '?start=0&size=10', { json: true }, function (err, res, body) {
-        if (err) {
-            callbackErr(err)
-        } else {
-            callbackSuccess(body)
-        }
-    });
+const baseUrlClients = 'https://hwa-spring.herokuapp.com/clients';
+
+class Service {
+
+    listerClients() {
+        // Envoi de la requête http GET /clients?start=0&size=10
+        return requestPromise(`${baseUrlClients}?start=0&size=10`, { json: true });
+    }
+
+    ajouterClient(saisieNom, saisiePrenom) {
+        // Envoi de la requête http POST /clients
+        return requestPromise(baseUrlClients, {
+            json: true,
+            method: 'POST',
+            body: {
+                nom: saisieNom,
+                prenoms: saisiePrenom
+            }
+        });
+    }
+
 }
 
-exports.listerClients = listerClients;
-
-function ajouterClient(saisieNom, saisiePrenom, callbackSuccess, callbackErr) {
-    // Envoi de la requête http POST /clients
-    request(baseUrlClients, {
-        json: true,
-        method: 'POST',
-        body: {
-            nom: saisieNom,
-            prenoms: saisiePrenom
-        }
-    }, function (err, res, body) {
-        if (err) {
-            callbackErr(err)
-        } else {
-            callbackSuccess(body)
-        }
-    });
-}
-
-exports.ajouterClient = ajouterClient;
+exports.Service = Service

@@ -1,50 +1,61 @@
-var readline = require('readline');
-var service = require('./service.js');
-var rl = readline.createInterface({
+const readline = require('readline');
+const { Service } = require('./service')
+
+const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-function start() {
-    console.log("1. Lister les clients \n2. Ajouter un client\n99. Sortir");
+const service = new Service()
 
-    rl.question('Veuillez choisir une option dans le menu : ', function (saisie) {
-        if (saisie === '1') {
-            console.log(`Vous avez saisi : ${saisie}`);
-            console.log(">> Liste des clients");
-            service.listerClients(
-                function (listeClient) {
-                    listeClient.forEach(el => console.log(el.nom + ' ' + el.prenoms));
-                    start();
-                }, function (err) {
-                    console.log('oops', err);
-                    start();
-                })
-        }
-        else if (saisie === '2') {
-            console.log(`Vous avez saisi : ${saisie}`);
-            rl.question('Entrez le nom du client : ', function (saisieNom) {
+class Presentation {
 
-                rl.question('Entrez le prénom du client : ', function (saisiePrenom) {
-
-                    service.ajouterClient(saisieNom, saisiePrenom, function (clientAjoute) {
-                        console.log('Client créé uuid =', clientAjoute.uuid);
+    start() {
+        console.log('1. Lister les clients \n2. Ajouter un client\n99. Sortir');
+    
+        rl.question('Veuillez choisir une option dans le menu : ', saisie => {
+    
+            if (saisie === '1') {
+                console.log(`Vous avez saisi : ${saisie}`);
+                console.log('>> Liste des clients');
+                service.listerClients()
+                    .then(listeClient => {
+                        listeClient.forEach(el => console.log(`${el.nom} ${el.prenoms}`));
                         start();
-                    }, function (err) {
+                    })
+                    .catch(err => {
                         console.log('oops', err);
                         start();
                     })
-
+            }
+            else if (saisie === '2') {
+                console.log(`Vous avez saisi : ${saisie}`);
+                rl.question('Entrez le nom du client : ', saisieNom => {
+    
+                    rl.question('Entrez le prénom du client : ', saisiePrenom => {
+    
+                        service.ajouterClient(saisieNom, saisiePrenom)
+                            .then(clientAjoute => {
+                                console.log('Client créé uuid =', clientAjoute.uuid);
+                                start();
+                            })
+                            .catch(err => {
+                                console.log('oops', err);
+                                start();
+                            })
+                    })
                 })
-            })
-        }
-        else if (saisie === '99') {
-            console.log(`Vous avez saisi : ${saisie}`);
-            console.log("Aurevoir");
-            rl.close();
-        }
-    });
+            }
+            else if (saisie === '99') {
+                console.log(`Vous avez saisi : ${saisie}`);
+                console.log('Aurevoir');
+                rl.close();
+            }
+        });
+    }
 }
-start();
 
-exports.fonctionStart = start;
+exports.Presentation = Presentation
+
+const presentation = new Presentation()
+presentation.start();

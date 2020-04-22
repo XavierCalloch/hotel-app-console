@@ -1,5 +1,5 @@
 console.log('** Administration Hotel **');
 
-var mod = require('./presentation.js');
+const mod = require('./presentation.js');
 
 mod.fonctionStart();
